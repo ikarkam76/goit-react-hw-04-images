@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useEffect, useState } from "react";
 import { AppContainer } from "components/App/App.styled";
 import { SearchBar } from "components/Searchbar/Searchbar";
 import { ImageGallery } from "components/ImageGallery/ImageGallery";
@@ -7,80 +7,81 @@ import { Loader } from "components/Loader/Loader";
 import { getImages } from "components/services/getImages";
 import { Modal } from "components/Modal/Modal";
 
-export class App extends Component {
-  state = {
-    searchName: '',
-    page: 0,
-    hits: [],
-    showLoader: false,
-    showModal: false,
-    largeImageURL: '',
-  };
+export const App = () => {
+  const [searchName, setSearchName] = useState('');
+  const [page, setPage] = useState(0);
+  const [hits, setHits] = useState([]);
+  const [showLoader, setShowloader] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImageURL, setlargeImageURL] = useState('');
 
-  componentDidUpdate = (_, prevState) => {
-    if (prevState.searchName !== this.state.searchName) {
-      this.setState({ hits: [], page: 1 }, this.fetchImages());
-    } else {
-      if (prevState.page !== this.state.page) {
-      this.fetchImages();
-    }}
-    
-  };
+  useEffect(() => {
+    if (searchName === '' || page === 0) {
+      return;
+    }
+    fetchImages();
+  }, [page])
 
-  fetchImages = () => {
-    getImages(this.state.searchName, this.state.page)
-      .then(val =>
-        this.setState({
-          hits: [...this.state.hits, ...val.data.hits],
-          showLoader: false,
-        })
+  useEffect(() => {
+    if (searchName === '' || page === 0) {
+      return;
+    }
+    setHits([]);
+    setPage(1);
+    fetchImages();
+  }, [searchName]);
+
+
+  const fetchImages = () => {
+    getImages(searchName, page)
+      .then(val => {
+        setHits([...hits, ...val.data.hits]);
+        setShowloader(false);
+      }
       )
       .catch(() => alert('Something went wrong'));
   };
 
-  onLoadMore = () => {
-    this.setState(
-      { page: this.state.page + 1, showLoader: true }
-    );
+  const onLoadMore = () => {
+    setPage(page => page + 1);
+    setShowloader(true);
   };
 
-  handleSubmit = ev => {
+  const handleSubmit = ev => {
     const searchName = ev.currentTarget[1].value.trim().split(' ').join('+');
     if (!searchName) {
       alert('Wow! The search field must not be empty!');
     } else {
-      this.setState(
-        { page: this.state.page + 1, searchName: searchName, showLoader: true }
-      );
+      setPage(page => page + 1);
+      setSearchName(searchName);
+      setShowloader(true);
     }
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  const toggleModal = () => {
+    setShowModal(!showModal);
+    // setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
-  handleOpenModal = (largeImageURL) => {
-    this.toggleModal();
-    this.setState({ largeImageURL: largeImageURL });
+  const handleOpenModal = (largeImageURL) => {
+    toggleModal();
+    setlargeImageURL(largeImageURL);
   };
 
-  render() {
-    const { hits, showLoader, showModal, largeImageURL } = this.state;
     return (
       <AppContainer>
         {showModal && (
-          <Modal onClose={this.toggleModal}>
+          <Modal onClose={toggleModal}>
             <img src={largeImageURL} alt={hits.tags} />
           </Modal>
         )}
-        <SearchBar onSubmit={this.handleSubmit} />
+        <SearchBar onSubmit={handleSubmit} />
         <ImageGallery
           images={hits}
-          onOpen={ev => this.handleOpenModal(largeImageURL)}
+          onOpen={largeImageURL => handleOpenModal(largeImageURL)}
         />
-        {hits.length > 0 && <Button onLoadMore={this.onLoadMore} />}
+        {hits.length > 0 && <Button onLoadMore={onLoadMore} />}
         <Loader visible={showLoader} />
       </AppContainer>
     );
-  }
 };
