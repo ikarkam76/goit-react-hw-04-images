@@ -20,7 +20,7 @@ export const App = () => {
       const fetchImages = () => {
         getImages(searchName, page)
           .then(response => {
-            setHits([...hits, ...response.data.hits]);
+            setHits(h => [...h, ...response.data.hits]);
             setShowloader(false);
           })
           .catch(() => alert('Something went wrong'));
