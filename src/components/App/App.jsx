@@ -16,31 +16,20 @@ export const App = () => {
   const [largeImageURL, setlargeImageURL] = useState('');
 
   useEffect(() => {
-    if (searchName === '' || page === 0) {
-      return;
+    if (searchName !== '' || page !== 0) {
+      const fetchImages = () => {
+        getImages(searchName, page)
+          .then(response => {
+            setHits([...hits, ...response.data.hits]);
+            setShowloader(false);
+          })
+          .catch(() => alert('Something went wrong'));
+      };
+      fetchImages();
     }
-    fetchImages();
-  }, [page])
+  },[page, searchName])
 
-  useEffect(() => {
-    if (searchName === '' || page === 0) {
-      return;
-    }
-    setHits([]);
-    setPage(1);
-    fetchImages();
-  }, [searchName]);
-
-
-  const fetchImages = () => {
-    getImages(searchName, page)
-      .then(val => {
-        setHits([...hits, ...val.data.hits]);
-        setShowloader(false);
-      }
-      )
-      .catch(() => alert('Something went wrong'));
-  };
+  
 
   const onLoadMore = () => {
     setPage(page => page + 1);
@@ -54,6 +43,8 @@ export const App = () => {
     } else {
       setPage(page => page + 1);
       setSearchName(searchName);
+      setHits([]);
+      setPage(1);
       setShowloader(true);
     }
   };
