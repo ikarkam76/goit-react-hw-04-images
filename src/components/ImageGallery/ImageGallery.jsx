@@ -1,5 +1,6 @@
 import { ImageGalleryItem } from "components/ImageGalleryItem/ImageGalleryItem";
 import React from "react";
+import PropTypes from 'prop-types';
 import { Gallery } from "./ImageGallery.styled";
 
 export const ImageGallery = ({ images, onOpen }) => {
@@ -17,5 +18,8 @@ export const ImageGallery = ({ images, onOpen }) => {
   );
 };
 
-
+ImageGallery.propTypes = {
+  onOpen: PropTypes.func.isRequired,
+  images: PropTypes.array.isRequired,
+}
 

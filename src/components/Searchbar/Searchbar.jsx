@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import { Button, ButtonLabel, Form, Input, Searchbar } from "./Searchbar.styled";
 import { FcSearch } from 'react-icons/fc';
 
@@ -24,3 +25,7 @@ export const SearchBar = ({onSubmit}) => {
     </Searchbar>
   );
 };
+
+SearchBar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+}
