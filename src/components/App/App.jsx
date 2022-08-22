@@ -17,15 +17,12 @@ export const App = () => {
 
   useEffect(() => {
     if (searchName !== '' || page !== 0) {
-      const fetchImages = () => {
         getImages(searchName, page)
           .then(response => {
-            setHits(h => [...h, ...response.data.hits]);
+            setHits(hit => [...hit, ...response.data.hits]);
             setShowloader(false);
           })
           .catch(() => alert('Something went wrong'));
-      };
-      fetchImages();
     }
   },[page, searchName])
 
